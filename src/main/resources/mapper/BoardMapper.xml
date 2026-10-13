@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.memberboard.board.mapper.BoardMapper">
+
+    <insert id="insert"
+            parameterType="com.example.memberboard.board.domain.Board">
+
+        <selectKey keyProperty="id"
+                   resultType="long"
+                   order="BEFORE">
+            SELECT boards_seq.NEXTVAL
+            FROM dual
+        </selectKey>
+
+        INSERT INTO boards (
+        id,
+        member_id,
+        title,
+        content
+        )
+        VALUES (
+        #{id},
+        #{memberId},
+        #{title},
+        #{content}
+        )
+
+    </insert>
+
+    <select id="findById"
+            resultType="com.example.memberboard.board.domain.Board">
+
+        SELECT
+        id,
+        member_id,
+        title,
+        content,
+        status,
+        created_at,
+        updated_at
+        FROM boards
+        WHERE id = #{id}
+        AND status = 'ACTIVE'
+
+    </select>
+
+    <select id="findAll"
+            resultType="com.example.memberboard.board.domain.Board">
+
+        SELECT
+        id,
+        member_id,
+        title,
+        content,
+        status,
+        created_at,
+        updated_at
+        FROM boards
+        WHERE status = 'ACTIVE'
+        ORDER BY id DESC
+
+    </select>
+
+    <update id="update"
+            parameterType="com.example.memberboard.board.domain.Board">
+
+        UPDATE boards
+        SET
+        title = #{title},
+        content = #{content},
+        updated_at = SYSTIMESTAMP
+        WHERE id = #{id}
+        AND status = 'ACTIVE'
+
+    </update>
+
+    <update id="deleteById">
+
+        UPDATE boards
+        SET
+        status = 'DELETED',
+        updated_at = SYSTIMESTAMP
+        WHERE id = #{id}
+        AND status = 'ACTIVE'
+
+    </update>
+
+</mapper>
