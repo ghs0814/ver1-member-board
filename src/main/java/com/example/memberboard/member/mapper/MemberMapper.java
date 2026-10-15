@@ -18,4 +18,11 @@ public interface MemberMapper {
     int update(Member member);
 
     int withdraw(@Param("id") Long id);
+
+    int countByEmail(@Param("email") String email); //등록용
+
+    int countByEmailExcludingId( //수정용
+            @Param("email") String email,
+            @Param("id") Long id
+    );
 }

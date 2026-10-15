@@ -88,5 +88,84 @@
         AND status = 'ACTIVE'
 
     </update>
+    <select id="findDetailById"
+            resultType="com.example.memberboard.board.dto.BoardDetailResponse">
+
+        SELECT
+        b.id,
+        b.member_id,
+        m.name AS member_name, <!-- memberName -->
+        b.title,
+        b.content,
+        b.status,
+        b.created_at,
+        b.updated_at
+        FROM boards b
+        INNER JOIN members m
+        ON b.member_id = m.id
+        WHERE b.id = #{id}
+        AND b.status = 'ACTIVE'
+
+    </select>
+
+    <select id="findAllWithMember"
+            resultType="com.example.memberboard.board.dto.BoardDetailResponse">
+
+        SELECT
+        b.id,
+        b.member_id,
+        m.name AS member_name,
+        b.title,
+        b.content,
+        b.status,
+        b.created_at,
+        b.updated_at
+        FROM boards b
+        INNER JOIN members m
+        ON b.member_id = m.id
+
+        <where>
+            b.status = 'ACTIVE'
+
+            <if test="keyword != null and keyword != ''">
+                AND (
+                UPPER(b.title)
+                LIKE '%' || UPPER(#{keyword}) || '%'
+                OR
+                UPPER(m.name)
+                LIKE '%' || UPPER(#{keyword}) || '%'
+                )
+            </if>
+        </where>
+
+        ORDER BY b.id DESC
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{size} ROWS ONLY
+
+    </select>
+
+    <select id="countAll"
+            resultType="long">
+
+        SELECT COUNT(*)
+        FROM boards b
+        INNER JOIN members m
+        ON b.member_id = m.id
+
+        <where>
+            b.status = 'ACTIVE'
+
+            <if test="keyword != null and keyword != ''">
+                AND (
+                UPPER(b.title)
+                LIKE '%' || UPPER(#{keyword}) || '%'
+                OR
+                UPPER(m.name)
+                LIKE '%' || UPPER(#{keyword}) || '%'
+                )
+            </if>
+        </where>
+
+    </select>
 
 </mapper>

@@ -76,4 +76,25 @@
         AND status = 'ACTIVE'
 
     </update>
+
+
+    <select id="countByEmail"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM members
+        WHERE email = #{email}
+
+    </select>
+
+    <select id="countByEmailExcludingId"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM members
+        WHERE email = #{email}
+        AND id &lt;&gt; #{id}
+
+    </select>
+
 </mapper>

@@ -5,9 +5,11 @@ import java.util.NoSuchElementException;
 
 import com.example.memberboard.board.domain.Board;
 import com.example.memberboard.board.dto.BoardCreateRequest;
+import com.example.memberboard.board.dto.BoardDetailResponse;
 import com.example.memberboard.board.dto.BoardResponse;
 import com.example.memberboard.board.dto.BoardUpdateRequest;
 import com.example.memberboard.board.mapper.BoardMapper;
+import com.example.memberboard.common.dto.PageResponse;
 import com.example.memberboard.member.domain.Member;
 import com.example.memberboard.member.mapper.MemberMapper;
 
@@ -68,14 +70,61 @@ public class BoardService {
         return BoardResponse.from(board);
     }
 
-    @Transactional(readOnly = true)
+   /* @Transactional(readOnly = true)
     public List<BoardResponse> getBoards() {
 
         return boardMapper.findAll()
                 .stream()
                 .map(BoardResponse::from)
                 .toList();
+    }*/
+
+    @Transactional(readOnly = true)
+    public PageResponse<BoardDetailResponse> getBoards(
+            String keyword,
+            int page,
+            int size
+    ) {
+
+        if (page < 0) {
+            throw new IllegalArgumentException(
+                    "page는 0 이상이어야 합니다."
+            );
+        }
+
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException(
+                    "size는 1 이상 100 이하여야 합니다."
+            );
+        }
+
+        String normalizedKeyword =
+                keyword == null ? "" : keyword.trim();
+
+        int offset = page * size;
+
+        List<BoardDetailResponse> content =
+                boardMapper.findAllWithMember(
+                        normalizedKeyword,
+                        offset,
+                        size
+                );
+
+        long totalElements =
+                boardMapper.countAll(normalizedKeyword);
+
+        int totalPages =
+                (int) ((totalElements + size - 1) / size);
+
+        return new PageResponse<>(
+                content,
+                page,
+                size,
+                totalElements,
+                totalPages
+        );
     }
+
 
     @Transactional
     public BoardResponse updateBoard(
@@ -126,4 +175,20 @@ public class BoardService {
             throw new IllegalStateException("게시글 삭제에 실패했습니다.");
         }
     }
+
+    @Transactional(readOnly = true)
+    public BoardDetailResponse getBoardDetail(Long id) {
+
+        BoardDetailResponse response = boardMapper.findDetailById(id);
+
+        if (response == null) {
+            throw new NoSuchElementException(
+                    "게시글을 찾을 수 없습니다. id=" + id
+            );
+        }
+
+        return response;
+    }
+
+
 }

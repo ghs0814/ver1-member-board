@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.memberboard.board.domain.Board;
 
+import com.example.memberboard.board.dto.BoardDetailResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +20,18 @@ public interface BoardMapper {
     int update(Board board);
 
     int deleteById(@Param("id") Long id);
+
+    BoardDetailResponse findDetailById(@Param("id") Long id);
+
+    List<BoardDetailResponse> findAllWithMember(
+            @Param("keyword") String keyword,
+            @Param("offset") int offset,
+            @Param("size") int size
+
+    );
+
+    long countAll(
+            @Param("keyword") String keyword
+    );
+
 }
